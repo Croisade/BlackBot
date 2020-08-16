@@ -1,0 +1,17 @@
+# Build Artifacts
+dist
+coverage
+
+# Code Editors / IDEs
+.idea
+.vscode
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Logs
+*.log
+
+# OS Clutter
+.DS_Store

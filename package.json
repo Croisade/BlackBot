@@ -4,16 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm run clean && babel ./src --ignore '__test__' -s -D -d lib",
+    "lint": "eslint ./src",
+    "clean": "rimraf lib",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js",
-    "start": "nodemon -w ./src --inspect --exec \"babel-node ./src\""
+    "dev": "nodemon -w ./src --inspect --exec \"babel-node ./src\"",
+    "start": "pm2-runtime start pm2.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.11.1",
-    "@croisade/eslint-config-node": "^1.0.1",
     "@discordjs/opus": "^0.3.2",
     "discord": "^0.8.2",
     "discord.js": "^12.2.0",
@@ -22,16 +23,21 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-import-resolver-babel-module": "^5.1.2",
     "eslint-plugin-import": "^2.22.0",
+    "ffmpeg-static": "^4.2.6",
     "fluent-ffmpeg": "^2.1.2",
     "nodemon": "^2.0.4",
+    "pm2": "^4.4.0",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "ytdl-core": "^3.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.1",
     "@babel/node": "^7.10.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
     "@babel/preset-env": "^7.11.0",
+    "@croisade/eslint-config-node": "^1.0.1",
     "babel-loader": "^8.1.0",
     "babel-plugin-module-resolver": "^4.0.0"
   }
