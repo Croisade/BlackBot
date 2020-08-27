@@ -13,8 +13,13 @@ client.on('message', (message) => {
 
   const args = message.content.substring(prefix.length).split(' ')
   const BlackBot = new DiscordService(args, message)
+  const queue = {}
 
-  if (message.content.startsWith(`${prefix}play`)) { BlackBot.playMusic() }
+  if (message.content.startsWith(`${prefix}play`)) {
+    console.log(`before play music ${JSON.stringify(queue)}`)
+    BlackBot.playMusic(queue)
+    console.log(`after play music ${JSON.stringify(queue)}`)
+  }
   if (message.content.startsWith(`${prefix}stop`)) { BlackBot.stopMusic() }
 })
 
