@@ -7,18 +7,18 @@ require('dotenv').config()
 
 const prefix = '?'
 
-client.on('message', (message) => {
+client.on('message', async (message) => {
   if (message.author.bot) return
   if (!message.content.startsWith(prefix)) return
 
   const args = message.content.substring(prefix.length).split(' ')
   const BlackBot = new DiscordService(args, message)
-  const queue = {}
 
   if (message.content.startsWith(`${prefix}play`)) {
-    console.log(`before play music ${JSON.stringify(queue)}`)
-    BlackBot.playMusic(queue)
-    console.log(`after play music ${JSON.stringify(queue)}`)
+    const queue = undefined
+    const loadedQueue = await BlackBot.loadQueue(queue)
+    console.log(queue)
+    await BlackBot.playMusic(loadedQueue)
   }
   if (message.content.startsWith(`${prefix}stop`)) { BlackBot.stopMusic() }
 })

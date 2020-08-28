@@ -1,6 +1,6 @@
 import { set, get } from 'lodash'
 
-const ytdl = require('ytdl-core')
+const ytdl = require('ytdl-core-discord')
 
 class DiscordService {
   constructor(args, message) {
@@ -8,16 +8,20 @@ class DiscordService {
     this.message = message
   }
 
-  async playMusic(queue) {
-    let serverQueue = get(queue, this.message.guild.id)
+  async loadQueue(queue) {
+    queue = {}
+    const songInfo = await ytdl.getInfo(this.args[1])
+    const serverId = this.message.guild.id
     const voiceChannel = this.message.member.voice.channel
     const permissions = voiceChannel.permissionsFor(this.message.client.user)
-    const songInfo = await ytdl.getInfo(this.args[1])
+    if (!voiceChannel) return this.message.channel.send('You need to join a voice channel to play music')
+    if (!permissions.has('CONNECT')) return this.message.channel.send('Give me permissions to join a voice channel')
+    if (!permissions.has('SPEAK')) return this.message.channel.send('Give me permissions to speak in a voice channel')
+
     const song = {
       title: songInfo.title,
       url: songInfo.video_url,
     }
-    if (!voiceChannel) return this.message.channel.send('You need to join a voice channel to play music')
     const queueConstruct = {
       textChannel: this.message.channel,
       voiceChannel: this.message.voiceChannel,
@@ -25,57 +29,51 @@ class DiscordService {
       songs: [],
       playing: true,
     }
+    if (!queue.serverId) { set(queue, `${serverId}.queue`, queueConstruct) }
 
-    if (!permissions.has('CONNECT')) return this.message.channel.send('Give me permissions to join a voice channel')
-    if (!permissions.has('SPEAK')) return this.message.channel.send('Give me permissions to speak in a voice channel')
-    if (!serverQueue) {
-      String(serverQueue)
-      set(queue, this.message.guild.id, queueConstruct)
-      serverQueue = get(queue, this.message.guild.id)
+    queue[serverId].queue.connection = await voiceChannel.join()
+    queue[serverId].queue.songs.push(song)
+    console.log(queue[serverId].queue.songs)
 
-      queueConstruct.songs.push(song)
-      console.log('this is running')
-      const firstSong = queueConstruct.songs[0]
+    this.message.channel.send(`${song.title} has been added to the queue`)
+    return queue
+  }
 
-      try {
-        const connection = await voiceChannel.join()
-        this.ytdlPlay(this.message.guild.id, firstSong, connection, queue)
-      } catch (error) {
-        console.log(`There was an error connecting to the voice channel ${error}`)
-        return this.message.channel.send(`There was an error connecting to the voice channel ${error}`)
+  async playMusic(queue) {
+    // const loadedQueue = this.loadQueue(queue)
+    const serverId = this.message.guild.id
+    const { connection } = queue[serverId].queue
+
+    const ytdlPlay = async (song, loadedQueue) => {
+      const serverQueue = get(loadedQueue, this.message.guild.id)
+      if (!song) {
+        this.message.member.voice.channel.leave()
       }
-      return undefined
+
+      const dispatcher = connection.play(await ytdl(song.url), { type: 'opus' })
+        .on('finish', () => {
+          queue[this.message.guild.id].queue.songs.shift()
+          ytdlPlay(queue[this.message.guild.id].queue.songs[0], queue)
+          console.log(queue[this.message.guild.id].queue.songs)
+        })
+        .on('error', error => this.message.channel.send(error))
+      dispatcher.setVolumeLogarithmic(5 / 5)
     }
-    console.log(queue)
-    // queue.serverQueue.queueConstruct.songs.push(song)
-    return this.message.channel.send(`${song.title} has been added to the queue`)
+
+    const firstSong = queue[serverId].queue.songs[0]
+    try {
+      ytdlPlay(firstSong, queue)
+    } catch (error) {
+      console.log(`There was an error connecting to the voice channel ${error}`)
+      return this.message.channel.send(`There was an error connecting to the voice channel ${error}`)
+    }
+    return undefined
   }
 
   async stopMusic() {
     if (!this.message.member.voice.channel) return this.message.channel.send('You need to be in a voice channel')
     this.message.member.voice.channel.leave()
     return undefined
-  }
-
-  ytdlPlay = (serverId, song, ytdlConnection, queue) => {
-    const serverQueue = get(queue, this.message.guild.id)
-    console.log(song)
-    if (!song) {
-      serverQueue.voiceChannel.leave()
-      queue.delete(serverId)
-    }
-
-    const dispatcher = ytdlConnection.play(ytdl(song.url))
-      .on('finish', () => {
-        serverQueue.songs.shift()
-        console.log(`this is queue ${queue}`)
-        this.ytdlPlay(serverId, serverQueue[0])
-      })
-      .on('error', (error) => {
-        console.log(error)
-        return this.message.channel.send(error)
-      })
-    dispatcher.setVolumeLogarithmic(5 / 5)
   }
 }
 
