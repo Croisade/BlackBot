@@ -8,8 +8,7 @@ class DiscordService {
     this.message = message
   }
 
-  async loadQueue(queue) {
-    queue = {}
+  async loadQueue() {
     const songInfo = await ytdl.getInfo(this.args[1])
     const serverId = this.message.guild.id
     const voiceChannel = this.message.member.voice.channel
@@ -17,6 +16,8 @@ class DiscordService {
     if (!voiceChannel) return this.message.channel.send('You need to join a voice channel to play music')
     if (!permissions.has('CONNECT')) return this.message.channel.send('Give me permissions to join a voice channel')
     if (!permissions.has('SPEAK')) return this.message.channel.send('Give me permissions to speak in a voice channel')
+
+    const queue = this.message.guild.id
 
     const song = {
       title: songInfo.title,

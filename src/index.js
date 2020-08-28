@@ -1,26 +1,39 @@
-import DiscordService from './services/DiscordService'
+import Client from '@/utils/client'
+import DiscordService from '@/services/DiscordService'
+
+const fs = require('fs')
 
 const Discord = require('discord.js')
 
-const client = new Discord.Client()
 require('dotenv').config()
 
-const prefix = '?'
+const client = new Client()
+client.commands = new Discord.Collection()
+
+const commandFiles = fs.readdirSync('./src/services').filter(file => file.endsWith('.js'))
+
+for (const file of commandFiles) {
+  const command = require(`./services/${file}`)
+  client.commands.set(command.name, command)
+}
+
+console.log(client.commands)
+
+const prefix = '~'
 
 client.on('message', async (message) => {
   if (message.author.bot) return
   if (!message.content.startsWith(prefix)) return
 
   const args = message.content.substring(prefix.length).split(' ')
-  const BlackBot = new DiscordService(args, message)
+  const command = client.commands.get(args[0])
 
-  if (message.content.startsWith(`${prefix}play`)) {
-    const queue = undefined
-    const loadedQueue = await BlackBot.loadQueue(queue)
-    console.log(queue)
-    await BlackBot.playMusic(loadedQueue)
+  try {
+    command.execute(message)
+  } catch (error) {
+    console.error(error)
+    message.reply('There was an error trying to execute that command!')
   }
-  if (message.content.startsWith(`${prefix}stop`)) { BlackBot.stopMusic() }
 })
 
 client.login(process.env.TOKEN)
