@@ -9,6 +9,7 @@ require('dotenv').config()
 
 const client = new Client()
 client.commands = new Discord.Collection()
+const embed = new Discord.MessageEmbed
 
 const commandFiles = fs.readdirSync('./src/services').filter(file => file.endsWith('.js'))
 
@@ -29,7 +30,7 @@ client.on('message', async (message) => {
   const command = client.commands.get(args[0])
 
   try {
-    command.execute(message)
+    command.execute(message, embed)
   } catch (error) {
     console.error(error)
     message.reply('There was an error trying to execute that command!')
