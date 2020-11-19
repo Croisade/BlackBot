@@ -1,14 +1,19 @@
 pipeline {
   agent {
     dockerfile {
-      filename 'Dockerfile'
+      filename 'true'
     }
 
   }
   stages {
     stage('Initialize') {
       steps {
-        echo 'Minimal pipeline'
+        sh '''node --version
+
+
+
+'''
+        sh 'pwd'
       }
     }
 
