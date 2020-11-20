@@ -18,7 +18,4 @@ pipeline {
     }
 
   }
-  environment {
-    GITHUB_TOKEN_ARG = '1e97d23ae323504f8de6221feaefc72ab179851d'
-  }
 }
