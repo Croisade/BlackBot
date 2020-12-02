@@ -1,5 +1,5 @@
 import Client from '@/utils/client'
-import DiscordService from '@/services/DiscordService'
+import forEach from 'lodash/forEach'
 
 const fs = require('fs')
 
@@ -9,13 +9,14 @@ require('dotenv').config()
 
 const client = new Client()
 client.commands = new Discord.Collection()
+const embed = new Discord.MessageEmbed()
 
 const commandFiles = fs.readdirSync('./src/services').filter(file => file.endsWith('.js'))
 
-for (const file of commandFiles) {
+forEach(commandFiles, (file) => {
   const command = require(`./services/${file}`)
   client.commands.set(command.name, command)
-}
+})
 
 console.log(client.commands)
 
@@ -29,7 +30,7 @@ client.on('message', async (message) => {
   const command = client.commands.get(args[0])
 
   try {
-    command.execute(message)
+    command.execute(message, embed)
   } catch (error) {
     console.error(error)
     message.reply('There was an error trying to execute that command!')
