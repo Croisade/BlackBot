@@ -3,7 +3,7 @@ const { Client, Collection } = require('discord.js')
 module.exports = class extends Client {
   constructor(config) {
     super({
-      disableEveryone: true,
+      disableEveryone: false,
       disabledEvents: ['TYPING_START'],
     })
 

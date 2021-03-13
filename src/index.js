@@ -1,5 +1,6 @@
 import Client from '@/utils/client'
 import forEach from 'lodash/forEach'
+import cron from 'node-cron'
 
 const fs = require('fs')
 
@@ -22,6 +23,12 @@ forEach(commandFiles, (file) => {
 console.log(client.commands)
 
 const prefix = '~'
+client.on('ready', () => {
+  const channel = client.channels.cache.find((chan) => chan.id === '750807318249341159')
+  cron.schedule('0 0 1 * *', () => {
+    channel.send(`<@&${'751097769040674877'}> Don't forget to pay your bills, First of the month!`)
+  })
+})
 
 client.on('message', async (message) => {
   if (message.author.bot) return
