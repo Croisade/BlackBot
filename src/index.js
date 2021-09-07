@@ -13,7 +13,7 @@ client.commands = new Discord.Collection()
 const embed = new Discord.MessageEmbed()
 const expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 const regex = new RegExp(expression)
-const commandFiles = fs.readdirSync('./src/services').filter((file) => file.endsWith('.js'))
+const commandFiles = fs.readdirSync('./src/services').filter(file => file.endsWith('.js'))
 
 forEach(commandFiles, (file) => {
   const command = require(`./services/${file}`)
@@ -24,8 +24,8 @@ console.log(client.commands)
 
 const prefix = '~'
 client.on('ready', () => {
-  const channel = client.channels.cache.find((chan) => chan.id === '750807318249341159')
-  cron.schedule('0 0 1 * *', () => {
+  const channel = client.channels.cache.find(chan => chan.id === '750807318249341159')
+  cron.schedule('0 8 1 * *', () => {
     channel.send(`<@&${'751097769040674877'}> Don't forget to pay your bills, First of the month!`)
   })
 })
@@ -34,7 +34,7 @@ client.on('message', async (message) => {
   if (message.author.bot) return
 
   if (message.channel.id === '750807318249341159' && message.content.match(regex)) {
-    const channel = client.channels.cache.find((chan) => chan.id === '809473464020369419')
+    const channel = client.channels.cache.find(chan => chan.id === '809473464020369419')
     channel.send(message.content)
   }
 
