@@ -1,9 +1,8 @@
 // const axios = require('axios')
 import axios from 'axios'
+import { kelvinToFahrenheit } from '../utils/weather'
 
 require('dotenv').config()
-
-const fs = require('fs')
 
 module.exports = {
   name: 'weather',
@@ -21,10 +20,24 @@ module.exports = {
         timeout: 1000,
       }
 
-      const { data } = await axios(config)
-      return message.channel.send(JSON.stringify(data))
+      const {
+        data: {
+          name,
+          // eslint-disable-next-line babel/camelcase
+          main: { temp, temp_max },
+        },
+      } = await axios(config)
+      const kToF = kelvinToFahrenheit(temp)
+      const kToFMAX = kelvinToFahrenheit(temp_max)
+      embed.setTitle(`Here is today's forecast for ${name}`)
+      embed.setDescription(
+        `Town/City: ${name} \nCurrent Temperature: ${kToF}°F \nHigh of: ${kToFMAX}°F`,
+      )
+      embed.setColor('#008000')
+      return message.channel.send(embed)
+      // return message.channel.send(JSON.stringify(data))
     } catch (e) {
-      return message.channel.send(e)
+      return message.channel.send('error')
     }
   },
 }
