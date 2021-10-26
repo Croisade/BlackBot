@@ -24,14 +24,15 @@ module.exports = {
         data: {
           name,
           // eslint-disable-next-line babel/camelcase
-          main: { temp, temp_max },
+          main: { temp, temp_max, feels_like },
         },
       } = await axios(config)
       const kToF = kelvinToFahrenheit(temp)
       const kToFMAX = kelvinToFahrenheit(temp_max)
+      const kToFFeels = kelvinToFahrenheit(feels_like)
       embed.setTitle(`Here is today's forecast for ${name}`)
       embed.setDescription(
-        `Town/City: ${name} \nCurrent Temperature: ${kToF}°F \nHigh of: ${kToFMAX}°F`,
+        `Town/City: ${name} \nCurrent Temperature: ${kToF}°F \nFeels Like: ${kToFFeels}°F \nHigh of: ${kToFMAX}°F`,
       )
       embed.setColor('#008000')
       return message.channel.send(embed)
