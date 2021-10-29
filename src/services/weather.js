@@ -23,16 +23,26 @@ module.exports = {
       const {
         data: {
           name,
-          // eslint-disable-next-line babel/camelcase
-          main: { temp, temp_max, feels_like },
+          main: {
+            temp,
+            // eslint-disable-next-line babel/camelcase
+            temp_max,
+            // eslint-disable-next-line babel/camelcase
+            feels_like,
+            // eslint-disable-next-line babel/camelcase
+            temp_min,
+          },
         },
       } = await axios(config)
       const kToF = kelvinToFahrenheit(temp)
       const kToFMAX = kelvinToFahrenheit(temp_max)
       const kToFFeels = kelvinToFahrenheit(feels_like)
-      embed.setTitle(`Here is today's forecast for ${name}`)
+      const kToFLOW = kelvinToFahrenheit(temp_min)
+      embed.setTitle(
+        `<a:NigHype:738137933156057178>  Here is today's forecast for ${name}    <a:NigHype:738137933156057178> `,
+      )
       embed.setDescription(
-        `Town/City: ${name} \nCurrent Temperature: ${kToF}°F \nFeels Like: ${kToFFeels}°F \nHigh of: ${kToFMAX}°F`,
+        `Town/City: ${name} \nCurrent Temperature: ${kToF}°F \nFeels Like: ${kToFFeels}°F \n:thermometer: High/Low: ${kToFMAX}°F/${kToFLOW}°F`,
       )
       embed.setColor('#008000')
       return message.channel.send(embed)
